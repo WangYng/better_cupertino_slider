@@ -1,0 +1,22 @@
+PODS:
+  - better_cupertino_slider (0.0.1):
+    - Flutter
+  - Flutter (1.0.0)
+
+DEPENDENCIES:
+  - better_cupertino_slider (from `.symlinks/plugins/better_cupertino_slider/ios`)
+  - Flutter (from `Flutter`)
+
+EXTERNAL SOURCES:
+  better_cupertino_slider:
+    :path: ".symlinks/plugins/better_cupertino_slider/ios"
+  Flutter:
+    :path: Flutter
+
+SPEC CHECKSUMS:
+  better_cupertino_slider: 6d3075e518d1d1c6ada1daeda96a247f67ab6832
+  Flutter: 0e3d915762c693b495b44d77113d4970485de6ec
+
+PODFILE CHECKSUM: 8e679eca47255a8ca8067c4c67aab20e64cb974d
+
+COCOAPODS: 1.9.3
