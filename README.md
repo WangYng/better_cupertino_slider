@@ -10,7 +10,7 @@ Advanced cupertino slider based on CupertinoSlider.
 
 ```yaml
 dependencies:
-  better_cupertino_slider: ^0.0.2
+  better_cupertino_slider: ^0.0.3
 ```
 
 2. Install it

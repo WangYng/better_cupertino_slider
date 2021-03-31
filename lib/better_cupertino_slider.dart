@@ -165,10 +165,17 @@ class _BetterRenderCupertinoSlider extends RenderConstrainedBox {
         _onChanged = onChanged,
         _textDirection = textDirection,
         super(additionalConstraints: configure.additionalConstraints) {
+    final GestureArenaTeam team = GestureArenaTeam();
     _drag = HorizontalDragGestureRecognizer()
+      ..team = team
       ..onStart = _handleDragStart
       ..onUpdate = _handleDragUpdate
       ..onEnd = _handleDragEnd;
+    _tap = TapGestureRecognizer()
+      ..team = team
+      ..onTapDown = _handleTapDown
+      ..onTapUp = _handleTapUp
+      ..onTapCancel = _endInteraction;
     _position = AnimationController(
       value: value,
       duration: _kDiscreteTransitionDuration,
@@ -222,6 +229,8 @@ class _BetterRenderCupertinoSlider extends RenderConstrainedBox {
   AnimationController _position;
 
   HorizontalDragGestureRecognizer _drag;
+  TapGestureRecognizer _tap;
+
   double _currentDragValue = 0.0;
 
   double get _discretizedCurrentDragValue {
@@ -273,12 +282,36 @@ class _BetterRenderCupertinoSlider extends RenderConstrainedBox {
 
   void _handleDragEnd(DragEndDetails details) => _endInteraction();
 
+  void _handleTapDown(TapDownDetails details) {
+    _startInteraction(details.globalPosition);
+  }
+
+  void _handleTapUp(TapUpDetails details) {
+    _endInteraction();
+  }
+
+  double _getValueFromVisualPosition(double visualPosition) {
+    switch (textDirection) {
+      case TextDirection.rtl:
+        return 1.0 - visualPosition;
+      case TextDirection.ltr:
+        return visualPosition;
+    }
+    return null;
+  }
+
+  double _getValueFromGlobalPosition(Offset globalPosition) {
+    final double visualPosition =
+        (globalToLocal(globalPosition).dx - _trackLeft) / _trackRight;
+    return _getValueFromVisualPosition(visualPosition);
+  }
+
   void _startInteraction(Offset globalPosition) {
     if (isInteractive) {
       if (onChangeStart != null) {
         onChangeStart(_discretizedCurrentDragValue);
       }
-      _currentDragValue = _value;
+      _currentDragValue = _getValueFromGlobalPosition(globalPosition);
       onChanged(_discretizedCurrentDragValue);
     }
   }
@@ -292,14 +325,22 @@ class _BetterRenderCupertinoSlider extends RenderConstrainedBox {
 
   @override
   bool hitTestSelf(Offset position) {
-    return (position.dx - _thumbCenter).abs() <
-        configure.thumbRadius + configure.trackHorizontalPadding;
+    if (configure.useTapGesture) {
+      return true;
+    } else {
+      return (position.dx - _thumbCenter).abs() <
+          configure.thumbRadius + configure.trackHorizontalPadding;
+    }
   }
 
   @override
   void handleEvent(PointerEvent event, BoxHitTestEntry entry) {
     assert(debugHandleEvent(event, entry));
-    if (event is PointerDownEvent && isInteractive) _drag.addPointer(event);
+    if (event is PointerDownEvent && isInteractive) {
+      // We need to add the drag first so that it has priority.
+      _drag.addPointer(event);
+      _tap.addPointer(event);
+    }
   }
 
   @override
@@ -446,6 +487,8 @@ const List<BoxShadow> kBetterSliderBoxShadows = <BoxShadow>[
 class BetterCupertinoSliderConfigure {
   final BoxConstraints additionalConstraints;
 
+  final bool useTapGesture;
+
   final double trackHorizontalPadding;
   final double trackHeight;
   final Color trackLeftColor;
@@ -457,6 +500,7 @@ class BetterCupertinoSliderConfigure {
   const BetterCupertinoSliderConfigure({
     this.additionalConstraints =
         const BoxConstraints.tightFor(width: 176.0, height: 28.0),
+    this.useTapGesture = true,
     this.trackHorizontalPadding = 8.0,
     this.trackHeight = 4.0,
     this.trackLeftColor = const Color(0xFFFF6B26),
@@ -467,6 +511,7 @@ class BetterCupertinoSliderConfigure {
 
   BetterCupertinoSliderConfigure copyWith({
     BoxConstraints additionalConstraints,
+    bool useTapGesture,
     double trackHorizontalPadding,
     double trackHeight,
     Color trackLeftColor,
@@ -477,6 +522,7 @@ class BetterCupertinoSliderConfigure {
     return BetterCupertinoSliderConfigure(
       additionalConstraints:
           additionalConstraints ?? this.additionalConstraints,
+      useTapGesture: useTapGesture ?? this.useTapGesture,
       trackHorizontalPadding:
           trackHorizontalPadding ?? this.trackHorizontalPadding,
       trackHeight: trackHeight ?? this.trackHeight,
