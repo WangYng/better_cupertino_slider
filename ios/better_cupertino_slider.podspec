@@ -4,7 +4,7 @@
 #
 Pod::Spec.new do |s|
   s.name             = 'better_cupertino_slider'
-  s.version          = '0.0.1'
+  s.version          = '0.0.2'
   s.summary          = 'Better cupertino slider.'
   s.description      = <<-DESC
 Better cupertino slider.

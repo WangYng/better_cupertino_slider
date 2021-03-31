@@ -161,6 +161,7 @@ class _BetterRenderCupertinoSlider extends RenderConstrainedBox {
   })  : assert(value != null && value >= 0.0 && value <= 1.0),
         assert(textDirection != null),
         _value = value,
+        _configure = configure,
         _onChanged = onChanged,
         _textDirection = textDirection,
         super(additionalConstraints: configure.additionalConstraints) {
