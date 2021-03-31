@@ -52,3 +52,4 @@ BetterCupertinoSlider(
 - [x] custom track and thumb
 - [x] step slider
 - [x] as linear progress
+- [x] tap gesture
