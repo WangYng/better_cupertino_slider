@@ -4,3 +4,5 @@ initial release.
 fix some issues.
 ## 0.0.3
 add tap gesture.
+## 1.0.0
+upgrade null-safe.
