@@ -25,27 +25,24 @@ class BetterCupertinoSlider extends StatefulWidget {
   /// * [onChangeEnd] is called when the user is done selecting a new value for
   ///   the slider.
   const BetterCupertinoSlider({
-    Key key,
-    @required this.value,
-    @required this.configure,
+    Key? key,
+    required this.value,
+    required this.configure,
     this.onChanged,
     this.onChangeStart,
     this.onChangeEnd,
     this.min = 0.0,
     this.max = 1.0,
-  })  : assert(value != null),
-        assert(min != null),
-        assert(max != null),
-        assert(value >= min && value <= max),
+  })  : assert(value >= min && value <= max),
         super(key: key);
 
   final double value;
 
-  final ValueChanged<double> onChanged;
+  final ValueChanged<double>? onChanged;
 
-  final ValueChanged<double> onChangeStart;
+  final ValueChanged<double>? onChangeStart;
 
-  final ValueChanged<double> onChangeEnd;
+  final ValueChanged<double>? onChangeEnd;
 
   final double min;
 
@@ -65,24 +62,23 @@ class BetterCupertinoSlider extends StatefulWidget {
   }
 }
 
-class _BetterCupertinoSliderState extends State<BetterCupertinoSlider>
-    with TickerProviderStateMixin {
+class _BetterCupertinoSliderState extends State<BetterCupertinoSlider> with TickerProviderStateMixin {
   void _handleChanged(double value) {
     assert(widget.onChanged != null);
-    final double lerpValue = lerpDouble(widget.min, widget.max, value);
+    final double lerpValue = lerpDouble(widget.min, widget.max, value)!;
     if (lerpValue != widget.value) {
-      widget.onChanged(lerpValue);
+      widget.onChanged!(lerpValue);
     }
   }
 
   void _handleDragStart(double value) {
     assert(widget.onChangeStart != null);
-    widget.onChangeStart(lerpDouble(widget.min, widget.max, value));
+    widget.onChangeStart!(lerpDouble(widget.min, widget.max, value)!);
   }
 
   void _handleDragEnd(double value) {
     assert(widget.onChangeEnd != null);
-    widget.onChangeEnd(lerpDouble(widget.min, widget.max, value));
+    widget.onChangeEnd!(lerpDouble(widget.min, widget.max, value)!);
   }
 
   @override
@@ -100,20 +96,20 @@ class _BetterCupertinoSliderState extends State<BetterCupertinoSlider>
 
 class _BetterCupertinoSliderRenderObjectWidget extends LeafRenderObjectWidget {
   const _BetterCupertinoSliderRenderObjectWidget({
-    Key key,
-    this.value,
-    this.configure,
+    Key? key,
+    required this.value,
+    required this.configure,
     this.onChanged,
     this.onChangeStart,
     this.onChangeEnd,
-    this.vsync,
+    required this.vsync,
   }) : super(key: key);
 
   final double value;
   final BetterCupertinoSliderConfigure configure;
-  final ValueChanged<double> onChanged;
-  final ValueChanged<double> onChangeStart;
-  final ValueChanged<double> onChangeEnd;
+  final ValueChanged<double>? onChanged;
+  final ValueChanged<double>? onChangeStart;
+  final ValueChanged<double>? onChangeEnd;
   final TickerProvider vsync;
 
   @override
@@ -130,8 +126,7 @@ class _BetterCupertinoSliderRenderObjectWidget extends LeafRenderObjectWidget {
   }
 
   @override
-  void updateRenderObject(
-      BuildContext context, _BetterRenderCupertinoSlider renderObject) {
+  void updateRenderObject(BuildContext context, _BetterRenderCupertinoSlider renderObject) {
     renderObject
       ..value = value
       ..configure = configure
@@ -146,20 +141,18 @@ class _BetterCupertinoSliderRenderObjectWidget extends LeafRenderObjectWidget {
 
 const Duration _kDiscreteTransitionDuration = Duration(milliseconds: 500);
 
-const double _kAdjustmentUnit =
-    0.1; // Matches iOS implementation of material slider.
+const double _kAdjustmentUnit = 0.1; // Matches iOS implementation of material slider.
 
 class _BetterRenderCupertinoSlider extends RenderConstrainedBox {
   _BetterRenderCupertinoSlider({
-    @required double value,
-    @required BetterCupertinoSliderConfigure configure,
-    ValueChanged<double> onChanged,
+    required double value,
+    required BetterCupertinoSliderConfigure configure,
+    ValueChanged<double>? onChanged,
     this.onChangeStart,
     this.onChangeEnd,
-    TickerProvider vsync,
-    @required TextDirection textDirection,
-  })  : assert(value != null && value >= 0.0 && value <= 1.0),
-        assert(textDirection != null),
+    required TickerProvider vsync,
+    required TextDirection textDirection,
+  })  : assert(value >= 0.0 && value <= 1.0),
         _value = value,
         _configure = configure,
         _onChanged = onChanged,
@@ -187,7 +180,7 @@ class _BetterRenderCupertinoSlider extends RenderConstrainedBox {
   double _value;
 
   set value(double newValue) {
-    assert(newValue != null && newValue >= 0.0 && newValue <= 1.0);
+    assert(newValue >= 0.0 && newValue <= 1.0);
     if (newValue == _value) return;
     _value = newValue;
     _position.value = newValue;
@@ -203,38 +196,37 @@ class _BetterRenderCupertinoSlider extends RenderConstrainedBox {
     markNeedsSemanticsUpdate();
   }
 
-  ValueChanged<double> get onChanged => _onChanged;
-  ValueChanged<double> _onChanged;
+  ValueChanged<double>? get onChanged => _onChanged;
+  ValueChanged<double>? _onChanged;
 
-  set onChanged(ValueChanged<double> value) {
+  set onChanged(ValueChanged<double>? value) {
     if (value == _onChanged) return;
     final bool wasInteractive = isInteractive;
     _onChanged = value;
     if (wasInteractive != isInteractive) markNeedsSemanticsUpdate();
   }
 
-  ValueChanged<double> onChangeStart;
-  ValueChanged<double> onChangeEnd;
+  ValueChanged<double>? onChangeStart;
+  ValueChanged<double>? onChangeEnd;
 
   TextDirection get textDirection => _textDirection;
   TextDirection _textDirection;
 
   set textDirection(TextDirection value) {
-    assert(value != null);
     if (_textDirection == value) return;
     _textDirection = value;
     markNeedsPaint();
   }
 
-  AnimationController _position;
+  late AnimationController _position;
 
-  HorizontalDragGestureRecognizer _drag;
-  TapGestureRecognizer _tap;
+  late HorizontalDragGestureRecognizer _drag;
+  late TapGestureRecognizer _tap;
 
   double _currentDragValue = 0.0;
 
   double get _discretizedCurrentDragValue {
-    double dragValue = _currentDragValue.clamp(0.0, 1.0) as double;
+    double dragValue = _currentDragValue.clamp(0.0, 1.0);
     return dragValue;
   }
 
@@ -252,22 +244,18 @@ class _BetterRenderCupertinoSlider extends RenderConstrainedBox {
         visualPosition = _value;
         break;
     }
-    return lerpDouble(_trackLeft + configure.thumbRadius,
-        _trackRight - configure.thumbRadius, visualPosition);
+    return lerpDouble(_trackLeft + configure.thumbRadius, _trackRight - configure.thumbRadius, visualPosition)!;
   }
 
   bool get isInteractive => onChanged != null;
 
-  void _handleDragStart(DragStartDetails details) =>
-      _startInteraction(details.globalPosition);
+  void _handleDragStart(DragStartDetails details) => _startInteraction(details.globalPosition);
 
   void _handleDragUpdate(DragUpdateDetails details) {
     if (isInteractive) {
-      final double extent = math.max(
-          configure.trackHorizontalPadding,
-          size.width -
-              2.0 * (configure.trackHorizontalPadding + configure.thumbRadius));
-      final double valueDelta = details.primaryDelta / extent;
+      final double extent = math.max(configure.trackHorizontalPadding,
+          size.width - 2.0 * (configure.trackHorizontalPadding + configure.thumbRadius));
+      final double valueDelta = details.primaryDelta! / extent;
       switch (textDirection) {
         case TextDirection.rtl:
           _currentDragValue -= valueDelta;
@@ -276,7 +264,7 @@ class _BetterRenderCupertinoSlider extends RenderConstrainedBox {
           _currentDragValue += valueDelta;
           break;
       }
-      onChanged(_discretizedCurrentDragValue);
+      onChanged!(_discretizedCurrentDragValue);
     }
   }
 
@@ -297,28 +285,26 @@ class _BetterRenderCupertinoSlider extends RenderConstrainedBox {
       case TextDirection.ltr:
         return visualPosition;
     }
-    return null;
   }
 
   double _getValueFromGlobalPosition(Offset globalPosition) {
-    final double visualPosition =
-        (globalToLocal(globalPosition).dx - _trackLeft) / _trackRight;
+    final double visualPosition = (globalToLocal(globalPosition).dx - _trackLeft) / _trackRight;
     return _getValueFromVisualPosition(visualPosition);
   }
 
   void _startInteraction(Offset globalPosition) {
     if (isInteractive) {
       if (onChangeStart != null) {
-        onChangeStart(_discretizedCurrentDragValue);
+        onChangeStart!(_discretizedCurrentDragValue);
       }
       _currentDragValue = _getValueFromGlobalPosition(globalPosition);
-      onChanged(_discretizedCurrentDragValue);
+      onChanged!(_discretizedCurrentDragValue);
     }
   }
 
   void _endInteraction() {
     if (onChangeEnd != null) {
-      onChangeEnd(_discretizedCurrentDragValue);
+      onChangeEnd!(_discretizedCurrentDragValue);
     }
     _currentDragValue = 0.0;
   }
@@ -328,8 +314,7 @@ class _BetterRenderCupertinoSlider extends RenderConstrainedBox {
     if (configure.useTapGesture) {
       return true;
     } else {
-      return (position.dx - _thumbCenter).abs() <
-          configure.thumbRadius + configure.trackHorizontalPadding;
+      return (position.dx - _thumbCenter).abs() < configure.thumbRadius + configure.trackHorizontalPadding;
     }
   }
 
@@ -433,23 +418,19 @@ class _BetterRenderCupertinoSlider extends RenderConstrainedBox {
       config.onIncrease = _increaseAction;
       config.onDecrease = _decreaseAction;
       config.value = '${(value * 100).round()}%';
-      config.increasedValue =
-          '${((value + _semanticActionUnit).clamp(0.0, 1.0) * 100).round()}%';
-      config.decreasedValue =
-          '${((value - _semanticActionUnit).clamp(0.0, 1.0) * 100).round()}%';
+      config.increasedValue = '${((value + _semanticActionUnit).clamp(0.0, 1.0) * 100).round()}%';
+      config.decreasedValue = '${((value - _semanticActionUnit).clamp(0.0, 1.0) * 100).round()}%';
     }
   }
 
   double get _semanticActionUnit => _kAdjustmentUnit;
 
   void _increaseAction() {
-    if (isInteractive)
-      onChanged((value + _semanticActionUnit).clamp(0.0, 1.0) as double);
+    if (isInteractive) onChanged!((value + _semanticActionUnit).clamp(0.0, 1.0));
   }
 
   void _decreaseAction() {
-    if (isInteractive)
-      onChanged((value - _semanticActionUnit).clamp(0.0, 1.0) as double);
+    if (isInteractive) onChanged!((value - _semanticActionUnit).clamp(0.0, 1.0));
   }
 }
 
@@ -498,8 +479,7 @@ class BetterCupertinoSliderConfigure {
   final BetterCupertinoThumbPainter thumbPainter;
 
   const BetterCupertinoSliderConfigure({
-    this.additionalConstraints =
-        const BoxConstraints.tightFor(width: 176.0, height: 28.0),
+    this.additionalConstraints = const BoxConstraints.tightFor(width: 176.0, height: 28.0),
     this.useTapGesture = true,
     this.trackHorizontalPadding = 8.0,
     this.trackHeight = 4.0,
@@ -510,21 +490,19 @@ class BetterCupertinoSliderConfigure {
   });
 
   BetterCupertinoSliderConfigure copyWith({
-    BoxConstraints additionalConstraints,
-    bool useTapGesture,
-    double trackHorizontalPadding,
-    double trackHeight,
-    Color trackLeftColor,
-    Color trackRightColor,
-    double thumbRadius,
-    BetterCupertinoThumbPainter thumbPainter,
+    BoxConstraints? additionalConstraints,
+    bool? useTapGesture,
+    double? trackHorizontalPadding,
+    double? trackHeight,
+    Color? trackLeftColor,
+    Color? trackRightColor,
+    double? thumbRadius,
+    BetterCupertinoThumbPainter? thumbPainter,
   }) {
     return BetterCupertinoSliderConfigure(
-      additionalConstraints:
-          additionalConstraints ?? this.additionalConstraints,
+      additionalConstraints: additionalConstraints ?? this.additionalConstraints,
       useTapGesture: useTapGesture ?? this.useTapGesture,
-      trackHorizontalPadding:
-          trackHorizontalPadding ?? this.trackHorizontalPadding,
+      trackHorizontalPadding: trackHorizontalPadding ?? this.trackHorizontalPadding,
       trackHeight: trackHeight ?? this.trackHeight,
       trackLeftColor: trackLeftColor ?? this.trackLeftColor,
       trackRightColor: trackRightColor ?? this.trackRightColor,
